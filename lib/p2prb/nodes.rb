@@ -1,4 +1,4 @@
-require 'simple_http.rb'
+require File.expand_path('../simple_http.rb',__FILE__)
 
 module P2P
   class NodeManager

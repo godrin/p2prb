@@ -1,3 +1,6 @@
 #!/usr/bin/env ruby
 
-abort "you need to write me"
+$:<<File.expand_path('../../lib',__FILE__)
+require 'p2prb'
+
+P2P::NodeApp.go! :host => P2P::localhost, :port => P2P::standardPort, :id=>"lksjdf"

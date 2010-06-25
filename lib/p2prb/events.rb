@@ -65,7 +65,7 @@ class MEM
     end
     def add_timed(job)
       add_timed_intern(job)
-      @timerThread.wakeup if @started
+      @timerThread.wakeup if @started and @timerThread.alive?
     end
   
     def timerLoop
