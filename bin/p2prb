@@ -2,5 +2,6 @@
 
 $:<<File.expand_path('../../lib',__FILE__)
 require 'p2prb'
+require 'masters'
 
-P2P::NodeApp.go! :host => P2P::localhost, :port => P2P::standardPort, :id=>"lksjdf"
+P2P::NodeApp.go! :host => P2P::localhost, :port => P2P::standardPort, :id=>"lksjdf", :masters=>MASTERS

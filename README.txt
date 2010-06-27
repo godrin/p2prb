@@ -1,14 +1,19 @@
 = p2prb
 
-* FIX (url)
+* http://github.com/godrin/p2prb
 
 == DESCRIPTION:
 
-FIX (describe your package)
+P2P Network with HTTP/YAML-based protocol.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+Features:
+* dicover other nodes
+
+Missing:
+* Send data
+* Find things
 
 == SYNOPSIS:
 

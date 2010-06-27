@@ -22,7 +22,7 @@ module P2P
       NodeManager.id=hash[:id]
       NodeManager.ip=hash[:host]
       NodeManager.port=hash[:port]
-      NodeManager.master=hash[:master]
+      NodeManager.masters=hash[:masters]||[hash[:master]]
       hash[:views]=File.expand_path('../views',__FILE__)
       pp hash
       run! hash
