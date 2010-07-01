@@ -11,7 +11,7 @@ masterId=777
 
 pid=fork
 unless pid
-  NodeApp.go! :host=>localhost,:port=>masterPort,:id=>"Master"
+  NodeApp.go! :host=>localhost,:port=>masterPort,:nodeid=>"Master"
   exit
 end
 pids=[pid]
@@ -23,7 +23,7 @@ master=Node.new(masterId,localhost,masterPort)
 pids+=otherNodes.map{|port|
   pid=fork
   unless pid
-    NodeApp.go! :host => localhost, :port => port, :id=>port,:master=>master
+    NodeApp.go! :host => localhost, :port => port, :nodeid=>port,:master=>master
     exit
   end
   pid

@@ -19,7 +19,7 @@ module P2P
   class NodeApp < Sinatra::Base
  
     def self.go!(hash)
-      NodeManager.id=hash[:id]
+      NodeManager.nodeid=hash[:nodeid]
       NodeManager.ip=hash[:host]
       NodeManager.port=hash[:port]
       NodeManager.masters=hash[:masters]||[hash[:master]]
@@ -49,6 +49,11 @@ module P2P
     get '/' do
       erb :index
     end
+    
+    get '/get_id' do
+      dynamic_header
+      YAML.dump(NodeManager.me)
+    end
 
     get '/get_nodes' do
       dynamic_header
@@ -61,7 +66,11 @@ module P2P
     end
 
     post '/register_node' do
+#      pp env
       node=YAML.load(params[:node])
+      pp "register new #{node}"
+      node.ip=env["REMOTE_HOST"]
+      pp "register new #{node} - sett ip"
 
       MEM.enqueue{
         puts "new node #{node}"

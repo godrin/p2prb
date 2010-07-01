@@ -1,3 +1,5 @@
+require 'pp'
+
 module P2P
 class MEM
   class MyJob
@@ -48,7 +50,11 @@ class MEM
             begin
               block.call
             rescue Object=>e
-              Logger::log(e)
+#              Logger::log(e)
+pp e
+if e.respond_to?(:backtrace)
+pp e.backtrace
+end
             end
           else
             sleep 0.010

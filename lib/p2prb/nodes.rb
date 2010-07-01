@@ -9,7 +9,7 @@ module P2P
       @@nm.send(*args)
     end
   
-    attr_accessor :masters, :port, :ip, :id
+    attr_accessor :masters, :port, :ip, :nodeid
     def initialize
       @nodes=[]
       @new_nodes=[]
@@ -17,7 +17,7 @@ module P2P
       @masters=nil
       @port=nil
       @ip=nil
-      @id=(rand*5000).to_i
+      @nodeid=(rand*5000).to_i
     
       @nodeMutex=Mutex.new
     
@@ -28,7 +28,7 @@ module P2P
     end
   
     def me
-      Node.new(@id,@ip,@port)
+      Node.new(@nodeid,@ip,@port)
     end
   
     def nodes
@@ -69,15 +69,25 @@ module P2P
     private
     def initial_register(trials=0)
       MEM.enqueue(0.5){
+      begin
         ok=false
+        pp" initial_reg #{self.masters}"
         if self.masters
-          self.master.each{|master|
-            http(master){|h|pp h.register_node(NodeManager.me); ok=true; add_node(master)}
+          self.masters.each{|master|
+          pp master
+          P2P::http(master){|h|
+            pp "trying #{master}"
+            pp h.register_node(NodeManager.me); ok=true; 
+            pp "ok ???" 
+            add_node(master)}
           }
           if not ok
             initial_register(trials+1) if trials<10
           end
         end
+        rescue Object=>e
+         pp e,e.backtrace
+         end
       }
     end
   
@@ -87,7 +97,8 @@ module P2P
         @peers.uniq!
         @peers.each{|peer|
           MEM.enqueue {
-            http(peer){|h|h.get_nodes}.each{|n|add_node(n)}
+            nodes=P2P::http(peer){|h|h.get_nodes}
+            nodes.each{|n|add_node(n)} if nodes
           }
         }
         query_other_nodes_for_new_nodes
@@ -99,8 +110,9 @@ module P2P
         @new_nodes.each{|node|
           MEM.enqueue{
             ok=false
-            http(node){|h|h.get_nodes ; ok=true}
-            checked_node(node) if ok 
+            othersMe=P2P::http(node){|h|oid=h.get_id ; ok=true; oid}
+#            pp othersMe, node, "equal ???"
+            checked_node(node) if othersMe==node.nodeid
           }
         }
         check_new_nodes

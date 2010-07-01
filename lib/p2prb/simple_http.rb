@@ -13,6 +13,10 @@ module P2P
     def register_node(node)
       post("/register_node",{'node'=>YAML.dump(node)})
     end
+    
+    def get_id
+      get("/get_id")
+    end
   
     def get_new_nodes
       get("/get_new_nodes")
@@ -37,8 +41,9 @@ module P2P
     end
   end
 
-  def http(node)
-    url = URI.parse("http://#{node.ip}:#{node.port}")
+  def self.http(node)
+    uri="http://#{node.ip}:#{node.port}"
+    url = URI.parse(uri)
     begin
       result=yield NodeHttp.new(url,node) #.instance_eval(&block)
     rescue

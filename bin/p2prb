@@ -1,7 +1,21 @@
 #!/usr/bin/env ruby
 
 $:<<File.expand_path('../../lib',__FILE__)
-require 'p2prb'
-require 'masters'
 
-P2P::NodeApp.go! :host => P2P::localhost, :port => P2P::standardPort, :id=>"lksjdf", :masters=>MASTERS
+require 'optparse'
+require 'ostruct'
+require 'p2prb'
+
+options=OpenStruct.new
+
+options.port=P2P::standardPort
+
+OptionParser.new{|opts|
+  opts.banner = "usage: p2prb [options]"
+  opts.on("-p N", "--port N", "Set port of http server", Integer) do |i|
+    options.port=i
+  end
+}.parse(ARGV)
+
+
+P2P::NodeApp.go! :host => P2P::localhost, :port => options.port, :nodeid=>P2P::generate_id, :masters=>MASTERS
