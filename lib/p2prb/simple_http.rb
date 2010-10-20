@@ -13,9 +13,13 @@ module P2P
     def register_node(node)
       post("/register_node",{'node'=>YAML.dump(node)})
     end
-    
+  
     def get_id
       get("/get_id")
+    end
+    
+    def me
+      get_id
     end
   
     def get_new_nodes
@@ -24,6 +28,14 @@ module P2P
 
     def get_nodes
       get("/get_nodes")
+    end
+    
+    def masters
+      get("/masters")
+    end
+    
+    def hash!(writer,name,value)
+      post("/hash",{:name=>name,:value=>value,:writer=>YAML.dump(writer)})
     end
   
     private
@@ -46,7 +58,12 @@ module P2P
     url = URI.parse(uri)
     begin
       result=yield NodeHttp.new(url,node) #.instance_eval(&block)
-    rescue
+    rescue SocketError => e
+       puts "HTTP Call failed to #{uri} - Could not connect"
+       nil
+    rescue Object=>e
+      pp e
+       puts "HTTP Call failed to #{uri}"
       nil
     end
     result

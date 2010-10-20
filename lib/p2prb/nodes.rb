@@ -9,7 +9,7 @@ module P2P
       @@nm.send(*args)
     end
   
-    attr_accessor :masters, :port, :ip, :nodeid
+    attr_accessor :masters, :port, :ip, :nodeid, :peers
     def initialize
       @nodes=[]
       @new_nodes=[]
@@ -43,7 +43,9 @@ module P2P
       @nodeMutex.synchronize {
         unless @nodes.member?(node)
           unless @new_nodes.member?(node)
-            @new_nodes<<node
+            if node_is_ok(node)
+              @new_nodes<<node
+            end
           end
         end
       }
@@ -65,29 +67,46 @@ module P2P
         end
       }
     end
+    
+    def valid?(node)
+      node_is_ok(node)
+    end
   
     private
+    
+    def node_is_ok(node)
+      node.nodeid=~/^[a-zA-Z0-9]*$/ and 
+      node.ip=~/^[a-z0-9\.-]*$/ and
+      node.port.is_a?(Integer) and 
+      [1025,65535,node.port].sort[1]==node.port # in between [1025,65535]
+    end
+    
     def initial_register(trials=0)
       MEM.enqueue(0.5){
-      begin
-        ok=false
-        pp" initial_reg #{self.masters}"
-        if self.masters
-          self.masters.each{|master|
-          pp master
-          P2P::http(master){|h|
-            pp "trying #{master}"
-            pp h.register_node(NodeManager.me); ok=true; 
-            pp "ok ???" 
-            add_node(master)}
-          }
-          if not ok
-            initial_register(trials+1) if trials<10
+        begin
+          ok=false
+          pp" initial_reg #{self.masters}"
+          if self.masters
+            self.masters.each{|master|
+              if master
+                pp master
+                P2P::http(master){|h|
+                  pp h.register_node(NodeManager.me); ok=true; 
+                  add_node(master)
+                }
+              end
+            }
+            if not ok
+              initial_register(trials+1) if trials<10
+            end
           end
-        end
+        rescue Errno::ECONNREFUSED=>e
+          puts "ERROR: Could not register!!!"
+        rescue SocketError=>e
+          puts "ERROR: Could not register!!! (SocketError)"
         rescue Object=>e
-         pp e,e.backtrace
-         end
+          pp e,e.backtrace
+        end
       }
     end
   
@@ -95,6 +114,9 @@ module P2P
       MEM.enqueue(5) {
         @peers+=self.masters if self.masters
         @peers.uniq!
+        @peers=@peers.select{|p| 
+          p 
+        }
         @peers.each{|peer|
           MEM.enqueue {
             nodes=P2P::http(peer){|h|h.get_nodes}
@@ -111,7 +133,6 @@ module P2P
           MEM.enqueue{
             ok=false
             othersMe=P2P::http(node){|h|oid=h.get_id ; ok=true; oid}
-#            pp othersMe, node, "equal ???"
             checked_node(node) if othersMe==node.nodeid
           }
         }

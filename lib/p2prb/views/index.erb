@@ -2,6 +2,21 @@
 <body>
 <a href='get_nodes'>get_nodes</a>
 <a href='get_new_nodes'>get_new_nodes</a>
+<a href='peers'>peers</a>
 INDEX
+<br/>
+
+<form method='post' action='/hash'>
+POST TO HASH<br/>
+Name:<input type='text' name='name'/><br/>
+Value:<input type='text' name='value'/><br/>
+</form>
+<ul>
+<% P2P::DistHash.entries.each{|k,v|%>
+ <li><a href='/hash?name=<%=k%>'><%=k%> - <%=v%></a></li>
+<% } %>
+</ul>
+<%=@blabla%>
+
 </body>
 </html>

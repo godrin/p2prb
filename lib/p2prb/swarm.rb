@@ -5,6 +5,7 @@ require 'pp'
 require File.expand_path('../common.rb',__FILE__)
 require File.expand_path('../events.rb',__FILE__)
 require File.expand_path('../nodes.rb',__FILE__)
+require File.expand_path('../dist_hash.rb',__FILE__)
 
 module P2P
 
@@ -24,7 +25,6 @@ module P2P
       NodeManager.port=hash[:port]
       NodeManager.masters=hash[:masters]||[hash[:master]]
       hash[:views]=File.expand_path('../views',__FILE__)
-      pp hash
       run! hash
     end
  
@@ -47,12 +47,23 @@ module P2P
     end
   
     get '/' do
+      @blabla="kjshdf"
       erb :index
     end
     
     get '/get_id' do
       dynamic_header
       YAML.dump(NodeManager.me)
+    end
+    
+    get '/masters' do
+      dynamic_header
+      YAML.dump(NodeManager.masters)
+    end
+
+    get '/peers' do
+      dynamic_header
+      YAML.dump(NodeManager.peers)
     end
 
     get '/get_nodes' do
@@ -66,17 +77,39 @@ module P2P
     end
 
     post '/register_node' do
-#      pp env
       node=YAML.load(params[:node])
-      pp "register new #{node}"
       node.ip=env["REMOTE_HOST"]
-      pp "register new #{node} - sett ip"
 
       MEM.enqueue{
         puts "new node #{node}"
         NodeManager.add_node(node)
       }
       "ok"
+    end
+    
+    post '/hash' do
+    pp env
+      writer=if params[:node].nil? and env["REMOTE_ADDR"]=="127.0.0.1"
+        NodeManager.me
+      else
+        YAML.load(params[:node])
+      end
+      writer.ip=env["REMOTE_HOST"]
+      if NodeManager.valid?(writer)
+        name=params[:name]
+        value=params[:value]
+        if DistHash.put(writer,name,value)
+          "ok"
+        else
+          "error"
+        end
+      else
+        "not allowed"
+      end
+    end
+    get '/hash' do
+      name=params["name"]
+      DistHash.get(name)
     end
   end
 end
