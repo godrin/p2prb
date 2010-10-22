@@ -1,7 +1,4 @@
 require "test/unit"
-#require File.expand_path('../stepping_job_queue.rb',__FILE__)
-#require File.expand_path('../event_queue.rb',__FILE__)
-
 require File.expand_path('../test_helper.rb',__FILE__)
 
 require 'p2prb/network/node_id.rb'
@@ -21,7 +18,6 @@ class TestP2prb < Test::Unit::TestCase
     assert_equal 1,a.diff(b)
     assert_equal 1,a.diff(c)
     assert_equal 2,b.diff(c)
-
   end
   def test_simple_network
     proxyKlass=NodeProxy

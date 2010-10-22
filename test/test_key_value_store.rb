@@ -1,7 +1,4 @@
 require "test/unit"
-#require File.expand_path('../stepping_job_queue.rb',__FILE__)
-#require File.expand_path('../event_queue.rb',__FILE__)
-
 require File.expand_path('../test_helper.rb',__FILE__)
 
 require 'p2prb/network/node_id.rb'

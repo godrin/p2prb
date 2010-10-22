@@ -4,6 +4,13 @@ require File.expand_path('../../base/event_queue.rb',__FILE__)
 
 require File.expand_path('../node_id.rb',__FILE__)
 
+
+module Node
+  def self.signature
+    [:known_nodes,:service,:got_new_peer]
+  end
+end
+
 #
 # Handles a single networking node.
 # does:
@@ -103,34 +110,34 @@ class BasicNode
   def checkForEnoughPeers
     if @peers.length<STANDARD_PEER_COUNT
       (@known_nodes-@peers-[self]).each {| node |
-        addAsPeer(node)
+        add_as_peer(node)
         break if @peers.length>=STANDARD_PEER_COUNT
       }
     end
   end
   
   def checkForNodesFromPeer(peer)
-    addNewNodes(peer.known_nodes)
+    add_new_nodes(peer.known_nodes)
   end
   
-  def addAsPeer(node)
+  def add_as_peer(node)
     passert{node}
     @peers<<node
-    node.gotNewPeer(self)
+    node.got_new_peer(self)
     event(:new_peer,node)
   end
   
-  def gotNewPeer(other)
+  def got_new_peer(other)
     @peers<<other
-    addNewNode(other)
+    add_new_node(other)
     event(:new_peer,other)
   end
   
-  def addNewNodes(others)
-    others.each{|other|addNewNode(other)}
+  def add_new_nodes(others)
+    others.each{|other|add_new_node(other)}
   end
   
-  def addNewNode(other)
+  def add_new_node(other)
     passert {other}
     unless @known_nodes.member?(other)
       @known_nodes<<other
