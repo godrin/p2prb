@@ -6,9 +6,6 @@ module P2P
   def self.generate_id
     h=Digest::SHA2.new << (rand.to_s+Time.now.to_s)
     h.to_s
-#    pp h.methods.sort
-#    pp h.to_s
-#    exit
   end
 
   def self.hexDist(hash1,hash2)
@@ -18,9 +15,7 @@ module P2P
       current=(hash1[i]^hash2[i])
       dist*=256
       dist+=current
-      #r+=c
     } 
     dist
-
   end
 end

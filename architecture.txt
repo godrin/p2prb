@@ -1,0 +1,6 @@
+= Communication
+
+There are three levels:
+* communication-layer (over http)
+* networking-layer
+* service-layer
