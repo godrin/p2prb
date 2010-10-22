@@ -16,7 +16,7 @@ module BasicProxy
     end
   
     def service(serviceKlass)
-      ServiceProxy.new(@node.service(serviceKlass))
+      BasicProxy::Service.new(@node.service(serviceKlass))
     end
   
     def _(node)

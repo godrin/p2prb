@@ -11,7 +11,14 @@ class TestNodeProxying < Test::Unit::TestCase
   class TestNode
     attr_accessor :known_nodes
     attr_accessor :service
-    attr_accessor :got_new_peer
+    attr_reader :peers
+    
+    def initialize
+      @peers=[]
+    end
+    def got_new_peer(p)
+      @peers<<p
+    end
   end
 
   def test_node_proxy_known_nodes
@@ -23,7 +30,14 @@ class TestNodeProxying < Test::Unit::TestCase
     l=[b,c,d]
     a.known_nodes=l
     assert_equal l,p.known_nodes
-    
+  end
+  
+  def test_node_proxy_new_peer
+    a=TestNode.new
+    b=TestNode.new
+    p=BasicProxy::Node.new(a)
+    p.got_new_peer(b)
+    assert_equal [b],a.peers
   end
 
   def test_peering_with_proxy
