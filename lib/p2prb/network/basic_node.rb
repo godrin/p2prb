@@ -7,7 +7,7 @@ require File.expand_path('../node_id.rb',__FILE__)
 
 module Node
   def self.signature
-    [:known_nodes,:service,:got_new_peer]
+    [:known_nodes,:service,:got_new_peer,:proxy]
   end
 end
 

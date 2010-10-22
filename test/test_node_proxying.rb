@@ -9,11 +9,13 @@ require 'pp'
 
 class TestNodeProxying < Test::Unit::TestCase
   class TestNode
+    attr_accessor :proxy
     attr_accessor :known_nodes
     attr_accessor :service
     attr_reader :peers
     
     def initialize
+      @proxy=self
       @peers=[]
     end
     def got_new_peer(p)
@@ -36,6 +38,7 @@ class TestNodeProxying < Test::Unit::TestCase
     a=TestNode.new
     b=TestNode.new
     p=BasicProxy::Node.new(a)
+    a.proxy=p
     p.got_new_peer(b)
     assert_equal [b],a.peers
   end

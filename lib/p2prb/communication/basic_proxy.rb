@@ -18,15 +18,14 @@ module BasicProxy
     def service(serviceKlass)
       BasicProxy::Service.new(@node.service(serviceKlass))
     end
+    
+    def proxy
+      self
+    end
   
     def _(node)
-      n=case node
-        when BasicProxy::Node
-          node
-        else
-          node.proxy
-      end
-      passert {n.is_a?(BasicProxy::Node)}
+      n=node.proxy
+      passert {n.has_signature?(::Node)}
       n
     end
   
