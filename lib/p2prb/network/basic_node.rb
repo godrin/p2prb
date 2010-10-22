@@ -24,18 +24,28 @@ class BasicNode
   attr_accessor :peers
   attr_accessor :known_nodes
   attr_accessor :masters
-  attr_accessor :proxy
+  attr_reader :proxy
   
   rule(:created) { enqueue{register_at_master} }
   rule(:new_nodes) { checkForEnoughPeers }
   rule(:new_peer) {|peer| checkForNodesFromPeer(peer) }
   
   def initialize
+    @proxy=self
     @peers=[]
     @known_nodes=[]
     @masters=[]
     @services={}
     event(:created)
+  end
+  
+  def proxy=(pProxy)
+    if @proxy==self
+      passert{pProxy.respond_to?(:known_nodes) and pProxy.respond_to?(:service)}
+      @proxy=pProxy
+    else
+      raise "proxy already set!"
+    end
   end
   
   def add_service(klass)
@@ -79,7 +89,9 @@ class BasicNode
     else
       @masters.each{|master|
         master.register(proxy)
-        @known_nodes+=master.known_nodes
+        nuNodes=master.known_nodes
+        nuNodes.each{|n|passert{n}}
+        @known_nodes+=nuNodes
         @known_nodes.uniq!
         @known_nodes.each{|n|passert{n}}
         event(:new_nodes)
@@ -119,6 +131,7 @@ class BasicNode
   end
   
   def addNewNode(other)
+    passert {other}
     unless @known_nodes.member?(other)
       @known_nodes<<other
       event(:new_nodes,[other])

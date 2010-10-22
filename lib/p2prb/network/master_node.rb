@@ -7,6 +7,7 @@ class MasterNode
   end
   
   def register(me)
+    passert{me}
     @known_nodes=(@known_nodes+[me]).uniq
   end
   def unregister(me)

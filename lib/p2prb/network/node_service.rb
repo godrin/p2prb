@@ -13,6 +13,10 @@ module NodeService
   def my_node
     @node
   end
+  def node_hash
+    @node.node_hash
+  end
+  
   def known_nodes
     @node.known_nodes
   end

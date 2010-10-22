@@ -10,26 +10,26 @@ class KeyValueStore
   end
   
   def get(key)
-    m=get_node_id(key)
-    if m==my_node_id
+    m=get_node(key)
+    if m==my_node
       @store[key]
     else
-      @node.remote_service(m,self.class).get(key)
+      service(m).get(key)
     end
   end
   
   def put(key,value)
-    m=get_node_id(key)
-    if m==my_node_id
+    m=get_node(key)
+    if m==my_node
       @store[key]=value
     else
-      @node.remote_service(m,self.class).put(key,value)
+      service(m).put(key,value)
     end
   end
   
-  def get_node_id(key)
+  def get_node(key)
     hash=NodeId.from_string(key)
-    m=known_node_ids.map{|a|[a,a.diff(hash)]}.min{|a,b | a[1]<=>b[1]}[0]
+    m=known_nodes.map{|a|[a,a.node_hash.diff(hash)]}.min{|a,b | a[1]<=>b[1]}[0]
   end
 end
 
@@ -43,13 +43,13 @@ class RedundantKeyValueStore
   end
   
   def get(key)
-    ms=get_node_id(key)
-    if ms.member?(my_node_id)
+    ms=get_node(key)
+    if ms.member?(my_node)
       @store[key]
     else
       ms.each{|m|
         begin
-          return @node.remote_service(m,self.class).get(key)
+          return service(m).get(key)
         rescue NodeError
         end
       }
@@ -58,8 +58,8 @@ class RedundantKeyValueStore
   end
   
   def put_internal(key,value)
-    ms=get_node_id(key)
-    if ms.member?(my_node_id)
+    ms=get_node(key)
+    if ms.member?(my_node)
       @store[key]=value
     else
       put(key,value)
@@ -67,14 +67,14 @@ class RedundantKeyValueStore
   end
   
   def put(key,value)
-    ms=get_node_id(key)
+    ms=get_node(key)
     ms.each{|m|
-      @node.remote_service(m,self.class).put_internal(key,value)
+      service(m).put_internal(key,value)
     }
   end
   
-  def get_node_id(key)
+  def get_node(key)
     hash=NodeId.from_string(key)
-    m=known_node_ids.map{|a|[a,a.diff(hash)]}.sort{|a,b | a[1]<=>b[1]}[0...@redundancy].map{|a|a[0]}
+    m=known_nodes.map{|a|[a,a.node_hash.diff(hash)]}.sort{|a,b | a[1]<=>b[1]}[0...@redundancy].map{|a|a[0]}
   end
 end
