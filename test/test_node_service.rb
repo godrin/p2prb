@@ -19,7 +19,7 @@ class TestNodeService < Test::Unit::TestCase
   def setup
     @a=BasicNode.new
     @b=BasicNode.new
-    @a.addNewNode(@b)
+    @a.add_new_node(@b)
     
     1.upto(5){||@a.step ; @b.step }
     

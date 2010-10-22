@@ -1,4 +1,4 @@
-require File.expand_path('../simple_http.rb',__FILE__)
+require File.expand_path('../../communication/simple_http.rb',__FILE__)
 require File.expand_path('../masters.rb',__FILE__)
 
 module P2P

@@ -2,10 +2,10 @@ require 'rubygems'
 require 'sinatra/base.rb'
 require 'yaml'
 require 'pp'
-require File.expand_path('../common.rb',__FILE__)
-require File.expand_path('../events.rb',__FILE__)
-require File.expand_path('../nodes.rb',__FILE__)
-require File.expand_path('../dist_hash.rb',__FILE__)
+require File.expand_path('../../network/common.rb',__FILE__)
+require File.expand_path('../../base/events.rb',__FILE__)
+require File.expand_path('../../network/nodes.rb',__FILE__)
+require File.expand_path('../../network/dist_hash.rb',__FILE__)
 
 module P2P
 

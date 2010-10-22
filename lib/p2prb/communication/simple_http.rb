@@ -1,7 +1,7 @@
 require 'net/http'
 require 'uri'
 require 'yaml'
-require File.expand_path('../common.rb',__FILE__)
+require File.expand_path('../../network/common.rb',__FILE__)
 
 module P2P
   class NodeHttp

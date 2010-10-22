@@ -1,3 +1,5 @@
+require File.expand_path('../../communication/swarm.rb',__FILE__)
+
 module P2P
 
 
@@ -8,7 +10,8 @@ module P2P
       @startTime=Time.now
       @port=port
       unless pid
-        NodeApp.go! :host => P2P::localhost, :port => port, :nodeid=>port,:master=>master
+        NodeApp.go! :host => P2P::localhost, 
+          :port => port, :nodeid=>port,:master=>master
         exit
       end
       @pid=pid

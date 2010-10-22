@@ -4,6 +4,7 @@ module BasicProxy
     attr_reader :node
 
     def initialize(node)
+      passert {node.has_signature?(::NodeImplementation)}
       @node=node
     end
     def got_new_peer(other)
@@ -31,6 +32,16 @@ module BasicProxy
   
     def <=>(x)
       @node<=>x.node
+    end
+  end
+  
+  class Service
+    def initialize(service)
+      @service=service
+    end
+    
+    def handle(*args)
+      @service.handle(*args)
     end
   end
 

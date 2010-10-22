@@ -10,6 +10,11 @@ module Node
     [:known_nodes,:service,:got_new_peer,:proxy]
   end
 end
+module NodeImplementation
+  def self.signature
+    ::Node.signature+[:add_service]
+  end
+end
 
 #
 # Handles a single networking node.

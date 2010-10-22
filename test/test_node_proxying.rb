@@ -3,6 +3,7 @@ require "test/unit"
 require File.expand_path('../test_helper.rb',__FILE__)
 
 require 'p2prb/network/basic_node.rb'
+require 'p2prb/network/node_service.rb'
 require 'p2prb/communication/basic_proxy.rb'
 
 require 'pp'
@@ -11,15 +12,29 @@ class TestNodeProxying < Test::Unit::TestCase
   class TestNode
     attr_accessor :proxy
     attr_accessor :known_nodes
-    attr_accessor :service
     attr_reader :peers
     
     def initialize
       @proxy=self
       @peers=[]
+      @services=[]	
     end
     def got_new_peer(p)
       @peers<<p
+    end
+    def add_service(s)
+      @services<<s.new
+    end
+    def service(x)
+      @services.select{|s|s.is_a?(x)}[0]
+    end
+  end
+  
+  class TestService
+    include NodeService
+    
+    def handle(ar)
+      ["ok"]+ar
     end
   end
 
@@ -41,6 +56,17 @@ class TestNodeProxying < Test::Unit::TestCase
     a.proxy=p
     p.got_new_peer(b)
     assert_equal [b],a.peers
+  end
+  
+  def test_node_proxy_get_service
+    serviceKlass=TestService
+    a=TestNode.new
+    b=TestNode.new
+    a.add_service(serviceKlass)
+    p=BasicProxy::Node.new(a)
+    s=p.service(serviceKlass)
+    l=[1,2,3]
+    assert_equal (["ok"]+l),s.handle(l)
   end
 
   def test_peering_with_proxy
