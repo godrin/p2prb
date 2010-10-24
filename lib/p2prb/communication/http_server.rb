@@ -1,11 +1,12 @@
 require 'rubygems'
-require 'sinatra/base.rb'
 require 'yaml'
-require 'pp'
+
+require File.expand_path('../../communication/sinatra_with_patch.rb',__FILE__)
 require File.expand_path('../../network/common.rb',__FILE__)
 require File.expand_path('../../base/events.rb',__FILE__)
 require File.expand_path('../../network/nodes.rb',__FILE__)
 require File.expand_path('../../network/dist_hash.rb',__FILE__)
+
 
 module P2P
 
@@ -17,14 +18,17 @@ module P2P
     5259
   end
 
-  class NodeApp < Sinatra::Base
+  class HttpServer < Sinatra::Base
  
     def self.go!(hash)
       NodeManager.nodeid=hash[:nodeid]
       NodeManager.ip=hash[:host]
       NodeManager.port=hash[:port]
       NodeManager.masters=hash[:masters]||[hash[:master]]
-      hash[:views]=File.expand_path('../views',__FILE__)
+      hash[:views]=File.expand_path('../../views',__FILE__)
+      hash[:environment]=:production
+      hash[:raise_errors]= true
+      hash[:logging]=false
       run! hash
     end
  
@@ -51,7 +55,7 @@ module P2P
       erb :index
     end
     
-    get '/get_id' do
+    get '/id' do
       dynamic_header
       YAML.dump(NodeManager.me)
     end
@@ -66,8 +70,12 @@ module P2P
       YAML.dump(NodeManager.peers)
     end
 
-    get '/get_nodes' do
+    get '/nodes' do
       dynamic_header
+      fromTime=params[:from]
+      if fromTime
+        raise "from filtering not yet implemented!"
+      end
       YAML.dump(NodeManager.nodes)
     end
 
@@ -88,7 +96,6 @@ module P2P
     end
     
     post '/hash' do
-    pp env
       writer=if params[:node].nil? and env["REMOTE_ADDR"]=="127.0.0.1"
         NodeManager.me
       else

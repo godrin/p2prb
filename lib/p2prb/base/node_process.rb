@@ -1,16 +1,16 @@
-require File.expand_path('../../communication/swarm.rb',__FILE__)
+require File.expand_path('../../communication/http_server.rb',__FILE__)
 
 module P2P
 
 
   class NodeProcess
-    def initialize(id,master=nil)
+    def initialize(id,master=nil,appType=P2P::HttpServer)
       pid=fork
       port=5000+id
       @startTime=Time.now
       @port=port
       unless pid
-        NodeApp.go! :host => P2P::localhost, 
+        appType.go! :host => P2P::localhost, 
           :port => port, :nodeid=>port,:master=>master
         exit
       end

@@ -2,9 +2,10 @@ require 'net/http'
 require 'uri'
 require 'yaml'
 require File.expand_path('../../network/common.rb',__FILE__)
+require File.expand_path('../../base/logger.rb',__FILE__)
 
 module P2P
-  class NodeHttp
+  class HttpClient
     def initialize(url,node)
       @url=url
       @node=node
@@ -57,13 +58,13 @@ module P2P
     uri="http://#{node.ip}:#{node.port}"
     url = URI.parse(uri)
     begin
-      result=yield NodeHttp.new(url,node) #.instance_eval(&block)
+      result=yield HttpClient.new(url,node) #.instance_eval(&block)
     rescue SocketError => e
-       puts "HTTP Call failed to #{uri} - Could not connect"
-       nil
+      log "HTTP Call failed to #{uri} - Could not connect"
+      nil
     rescue Object=>e
-      pp e
-       puts "HTTP Call failed to #{uri}"
+      P2P::Logging.log e
+      P2P::Logging.log "HTTP Call failed to #{uri}"
       nil
     end
     result

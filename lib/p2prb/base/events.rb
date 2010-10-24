@@ -50,10 +50,9 @@ module P2P
               begin
                 block.call
               rescue Object=>e
-#              Logger::log(e)
-                pp e
+                log e
                 if e.respond_to?(:backtrace)
-                  pp e.backtrace
+                  log e.backtrace
                 end
               end
             else
@@ -76,7 +75,7 @@ module P2P
   
       def timerLoop
         @started=true
-        pp "timer Loop stzartzed"
+        log "Timer Loop started"
         begin
           loop do
             if @timed.length>0
@@ -95,13 +94,11 @@ module P2P
               sleep 1
             end
           end
-        rescue Object>=e
-          pp e
-          pp "ERROR ???"
-        rescue
-          pp "klsdklsdfjklsdf"
+        rescue Object=>e
+          log e
+          log "ERROR ???"
         end
-        pp "timer Loop ended"
+        log "Timer Loop ended"
       end
     end
 
