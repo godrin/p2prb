@@ -6,9 +6,9 @@ require File.expand_path('../../base/logger.rb',__FILE__)
 
 module P2P
   class HttpClient
-    def initialize(url,node)
+    def initialize(url) #,node)
       @url=url
-      @node=node
+#      @node=node
     end
   
     def register_node(node)
@@ -27,8 +27,8 @@ module P2P
       get("/get_new_nodes")
     end
 
-    def get_nodes
-      get("/get_nodes")
+    def nodes
+      get("/nodes")
     end
     
     def masters
@@ -58,7 +58,7 @@ module P2P
     uri="http://#{node.ip}:#{node.port}"
     url = URI.parse(uri)
     begin
-      result=yield HttpClient.new(url,node) #.instance_eval(&block)
+      result=yield HttpClient.new(url) #,node) #.instance_eval(&block)
     rescue SocketError => e
       log "HTTP Call failed to #{uri} - Could not connect"
       nil

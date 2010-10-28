@@ -3,18 +3,27 @@ require 'sinatra/base.rb'
 
 module Sinatra
   class Base
+  
+    Address=Struct.new(:host,:port)
+  
+    attr_accessor :server
     def self.run!(options={})
       started=false
+      result=nil
       Thread.new {
         begin
           set options
 #          set :logging, false
           handler      = detect_rack_handler
           handler_name = handler.name.gsub(/.*::/, '')
-#          puts "== Sinatra/#{Sinatra::VERSION} has taken the stage " +
-#            "on #{port} for #{environment} with backup from #{handler_name}" unless handler_name =~/cgi/i
+          puts "== Sinatra/#{Sinatra::VERSION} has taken the stage " +
+            "on #{port} for #{environment} with backup from #{handler_name}" unless handler_name =~/cgi/i
           ::Thin::Logging.silent=true
-          handler.run self, :Host => bind, :Port => port do |server|
+          
+          app=self.new
+          
+          result=app
+          handler.run app, :Host => bind, :Port => port do |server|
             trap(:INT) do
               ## Use thins' hard #stop! if available, otherwise just #stop
               server.respond_to?(:stop!) ? server.stop! : server.stop
@@ -22,6 +31,7 @@ module Sinatra
             end
             set :running, true
             @server=server
+            app.server=server
             started=true
           end
         rescue Errno::EADDRINUSE => e
@@ -30,6 +40,15 @@ module Sinatra
       }
       
       sleep 0.002 while started==false
+      result
+    end
+    
+    def url
+ #     pp @server.methods.sort
+      #pp methods.sort
+      Address.new(@server.host,@server.port)
+#      "http://#{@server.host}:#{@server.port}"
+      #nil
     end
     
     def stop!

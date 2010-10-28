@@ -19,17 +19,24 @@ module P2P
   end
 
   class HttpServer < Sinatra::Base
+    attr_accessor :node
+    
+    def initialize(hash)
+      @node=hash[:node]
+      super
+    end
  
     def self.go!(hash)
-      NodeManager.nodeid=hash[:nodeid]
-      NodeManager.ip=hash[:host]
-      NodeManager.port=hash[:port]
-      NodeManager.masters=hash[:masters]||[hash[:master]]
+      @node.nodeid=hash[:nodeid]
+      @node.ip=hash[:host]
+      @node.port=hash[:port]
+      @node.masters=hash[:masters]||[hash[:master]]
       hash[:views]=File.expand_path('../../views',__FILE__)
       hash[:environment]=:production
       hash[:raise_errors]= true
       hash[:logging]=false
-      run! hash
+      app=run! hash
+      app.node=hash[:node]
     end
  
     def html?
@@ -57,52 +64,99 @@ module P2P
     
     get '/id' do
       dynamic_header
-      YAML.dump(NodeManager.me)
+      YAML.dump(@node.me)
     end
     
     get '/masters' do
       dynamic_header
-      YAML.dump(NodeManager.masters)
+      YAML.dump(@node.masters)
     end
 
     get '/peers' do
       dynamic_header
-      YAML.dump(NodeManager.peers)
+      YAML.dump(@node.peers)
     end
 
     get '/nodes' do
       dynamic_header
-      fromTime=params[:from]
-      if fromTime
-        raise "from filtering not yet implemented!"
+      if params[:younger_than]
+        d=Time.parse(params[:younger_than])
+        YAML.dump(@node.nodes_younger_than(d))
+      else
+        YAML.dump(@node.nodes)
       end
-      YAML.dump(NodeManager.nodes)
-    end
-
-    get '/get_new_nodes' do
-      dynamic_header
-      YAML.dump(NodeManager.new_nodes)
     end
 
     post '/register_node' do
       node=YAML.load(params[:node])
       node.ip=env["REMOTE_HOST"]
-
-      MEM.enqueue{
-        puts "new node #{node}"
-        NodeManager.add_node(node)
-      }
+      
+      @node.add_node(node)
       "ok"
     end
     
+    get '/service/:name/:method' do
+      begin
+        name=params[:name]
+        method=params[:method]
+        if secure?(method)
+          service=@node.service(name)
+          f=service.method(method)
+          if f.arity==1
+            YAML.dump(f.call(params))
+          else
+            YAML.dump(f.call)
+          end
+        else
+          "fail"
+        end
+      rescue Object=>e
+        puts e,e.backtrace
+        "fail"
+      end
+    end
+
+    post '/service/:name/:method' do
+      begin
+        name=params[:name]
+        method=params[:method]+"!"
+        if secure?(method)
+          service=@node.service(name)
+          f=service.method(method)
+          if f.arity==1
+            YAML.dump(f.call(params))
+          else
+            YAML.dump(f.call)
+          end
+        else
+          "fail"
+        end
+      rescue Object=>e
+        puts e,e.backtrace
+        "fail"
+      end
+    end
+    
+    def secure?(method)
+      if ["method_missing","send","call","eval"].member?(method)
+        false
+      elsif method=~/.*eval.*/ or method=~/^_.*/
+        false
+      else
+        true
+      end      
+    end
+    
+    # this deprecated - services should be generic
+    if false
     post '/hash' do
       writer=if params[:node].nil? and env["REMOTE_ADDR"]=="127.0.0.1"
-        NodeManager.me
+        @node.me
       else
         YAML.load(params[:node])
       end
       writer.ip=env["REMOTE_HOST"]
-      if NodeManager.valid?(writer)
+      if @node.valid?(writer)
         name=params[:name]
         value=params[:value]
         if DistHash.put(writer,name,value)
@@ -117,6 +171,7 @@ module P2P
     get '/hash' do
       name=params["name"]
       DistHash.get(name)
+    end
     end
   end
 end
