@@ -1,6 +1,7 @@
 
 module NodeService
   def node=(pnode)
+    @node||=nil
     if @node.nil?
       @node=pnode
       unless @node.respond_to?(:known_nodes) && @node.respond_to?(:service)

@@ -1,7 +1,5 @@
 require 'digest/sha1'
 
-require File.expand_path('../../base/basics.rb',__FILE__)
-
 class NodeId
   def initialize(i)
     if i.is_a?(String)

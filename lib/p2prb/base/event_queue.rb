@@ -37,7 +37,7 @@ module EventQueue
       }
       puts "No Rule found for #{event.name} in #{self}" if rules.length==0
       rules.each{|rule|
-        instance_exec *event.data,&rule.proc
+        instance_exec(*event.data, &rule.proc)
       }
     end
   end

@@ -1,11 +1,12 @@
 require "test/unit"
-require File.expand_path('../test_helper.rb',__FILE__)
+#require File.expand_path('../test_helper.rb',__FILE__)
 
-require 'p2prb/network/node_id.rb'
-require 'p2prb/network/key_value_store.rb'
-require 'p2prb/network/master_node.rb'
-require 'p2prb/network/basic_node.rb'
-require 'p2prb/communication/basic_proxy.rb'
+require 'p2prb'
+#require 'p2prb/network/node_id.rb'
+#require 'p2prb/network/key_value_store.rb'
+#require 'p2prb/network/master_node.rb'
+#require 'p2prb/network/basic_node.rb'
+#require 'p2prb/communication/basic_proxy.rb'
 
 class TestP2prb < Test::Unit::TestCase
   def test_distance_of_node_ids
@@ -55,7 +56,7 @@ class TestP2prb < Test::Unit::TestCase
 
   def setupNetwork(nodeCount,steps=4)
     master=MasterNode.new
-    nodes=(0...nodeCount).to_a.map{|i|BasicNode.new}
+    nodes=(0...nodeCount).to_a.map{|i|Basic::Node.new}
     nodes.each{|node|node.add_master(master)}
     1.upto(steps) {
       nodes.each{|node|node.step}

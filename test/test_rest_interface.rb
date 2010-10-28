@@ -1,11 +1,5 @@
-require 'rubygems'
-require "test/unit"
 require 'rack/test'
-
-require File.expand_path('../test_helper.rb',__FILE__)
-
-require 'p2prb/communication/http_server.rb'
-require 'p2prb/communication/http_client.rb'
+require 'p2prb'
 
 class TestRestInterface < Test::Unit::TestCase
   include Rack::Test::Methods

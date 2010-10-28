@@ -58,7 +58,7 @@ module P2P
     uri="http://#{node.ip}:#{node.port}"
     url = URI.parse(uri)
     begin
-      result=yield HttpClient.new(url) #,node) #.instance_eval(&block)
+      result=yield HttpClient.new(url)
     rescue SocketError => e
       log "HTTP Call failed to #{uri} - Could not connect"
       nil

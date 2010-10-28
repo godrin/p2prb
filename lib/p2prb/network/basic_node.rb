@@ -1,20 +1,22 @@
-require File.expand_path('../../base/basics.rb',__FILE__)
 require File.expand_path('../../base/stepping_job_queue.rb',__FILE__)
 require File.expand_path('../../base/event_queue.rb',__FILE__)
 
 require File.expand_path('../node_id.rb',__FILE__)
-
 
 module Node
   def self.signature
     [:known_nodes,:service,:got_new_peer,:proxy]
   end
 end
+
 module NodeImplementation
   def self.signature
     ::Node.signature+[:add_service]
   end
 end
+
+module Basic
+
 
 #
 # Handles a single networking node.
@@ -27,7 +29,7 @@ end
 #  * handles services
 #
 #
-class BasicNode
+class Node
   include SteppingJobQueue
   include EventQueue
   
@@ -36,6 +38,7 @@ class BasicNode
   attr_accessor :peers
   attr_accessor :known_nodes
   attr_accessor :masters
+  attr_accessor :nodeid, :ip, :port
   attr_reader :proxy
   
   rule(:created) { enqueue{register_at_master} }
@@ -157,4 +160,7 @@ class BasicNode
   def <=>(other)
     node_hash<=>other.node_hash
   end
+end
+
+
 end

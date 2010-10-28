@@ -1,11 +1,4 @@
-require "test/unit"
-
-require File.expand_path('../test_helper.rb',__FILE__)
-
-require 'p2prb/network/basic_node.rb'
-require 'p2prb/network/node_service.rb'
-
-require 'pp'
+require 'p2prb'
 
 class TestNodeService < Test::Unit::TestCase
 
@@ -17,8 +10,8 @@ class TestNodeService < Test::Unit::TestCase
   end
   
   def setup
-    @a=BasicNode.new
-    @b=BasicNode.new
+    @a=Basic::Node.new
+    @b=Basic::Node.new
     @a.add_new_node(@b)
     
     1.upto(5){||@a.step ; @b.step }

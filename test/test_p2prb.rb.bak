@@ -1,5 +1,5 @@
 require "test/unit"
-require "p2prb"
+#require "p2prb"
 require File.expand_path('../test_helper.rb',__FILE__)
 require 'p2prb/base/node_process.rb'
 

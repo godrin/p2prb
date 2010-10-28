@@ -27,10 +27,12 @@ module P2P
     end
  
     def self.go!(hash)
-      @node.nodeid=hash[:nodeid]
-      @node.ip=hash[:host]
-      @node.port=hash[:port]
-      @node.masters=hash[:masters]||[hash[:master]]
+      node=hash[:node]
+
+      node.nodeid=hash[:nodeid]
+      node.ip=hash[:host]
+      node.port=hash[:port]
+      node.masters=hash[:masters]||[hash[:master]]
       hash[:views]=File.expand_path('../../views',__FILE__)
       hash[:environment]=:production
       hash[:raise_errors]= true

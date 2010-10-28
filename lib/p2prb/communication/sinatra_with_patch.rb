@@ -7,6 +7,8 @@ module Sinatra
     Address=Struct.new(:host,:port)
   
     attr_accessor :server
+    
+#    undef :run!
     def self.run!(options={})
       started=false
       result=nil
@@ -20,7 +22,7 @@ module Sinatra
             "on #{port} for #{environment} with backup from #{handler_name}" unless handler_name =~/cgi/i
           ::Thin::Logging.silent=true
           
-          app=self.new
+          app=self.new(options)
           
           result=app
           handler.run app, :Host => bind, :Port => port do |server|

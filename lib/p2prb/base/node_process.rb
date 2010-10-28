@@ -1,4 +1,5 @@
 require File.expand_path('../../communication/http_server.rb',__FILE__)
+require File.expand_path('../../network/basic_node.rb',__FILE__)
 
 module P2P
 
@@ -8,10 +9,11 @@ module P2P
       pid=fork
       port=5000+id
       @startTime=Time.now
+      @node=Basic::Node.new
       @port=port
       unless pid
         appType.go! :host => P2P::localhost, 
-          :port => port, :nodeid=>port,:master=>master
+          :port => port, :nodeid=>port,:master=>master,:node=>@node
         exit
       end
       @pid=pid
