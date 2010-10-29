@@ -15,11 +15,16 @@ class TestHttpClient < Test::Unit::TestCase
   def setup
     @node=Testing::Node.new
     @node.nodes=[1,2,3]
+    @client=P2P::HttpClient.new(self)
   end
   
   def test_get_nodes
-    @client=P2P::HttpClient.new(self)
     assert_equal [1,2,3],@client.nodes    
+  end
+  
+  def test_post_node
+    @client.nodes=[567]
+    assert_equals [567],@node.nodes
   end
   
   
