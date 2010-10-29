@@ -3,7 +3,7 @@ require 'p2prb'
 class TestNodeProxying < Test::Unit::TestCase
   class TestNode
     attr_accessor :proxy
-    attr_accessor :known_nodes
+    attr_accessor :nodes
     attr_reader :peers
     
     def initialize
@@ -37,8 +37,8 @@ class TestNodeProxying < Test::Unit::TestCase
     d=TestNode.new
     p=BasicProxy::Node.new(a)
     l=[b,c,d]
-    a.known_nodes=l
-    assert_equal l,p.known_nodes
+    a.nodes=l
+    assert_equal l,p.nodes
   end
   
   def test_node_proxy_new_peer

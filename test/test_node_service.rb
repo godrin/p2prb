@@ -31,11 +31,11 @@ class TestNodeService < Test::Unit::TestCase
     @bService.check(@a,@aService)
   end
   
-  def test_node_known_nodes
-    assert @aService.known_nodes.member?(@a)
-    assert @aService.known_nodes.member?(@b)
-    assert @bService.known_nodes.member?(@a)
-    assert @bService.known_nodes.member?(@b)
+  def test_node_nodes
+    assert @aService.nodes.member?(@a)
+    assert @aService.nodes.member?(@b)
+    assert @bService.nodes.member?(@a)
+    assert @bService.nodes.member?(@b)
     
     assert_equal @a,@aService.my_node
     assert_equal @b,@bService.my_node

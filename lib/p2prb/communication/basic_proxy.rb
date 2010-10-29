@@ -11,9 +11,9 @@ module BasicProxy
       @node.got_new_peer(_(other))
     end
   
-    def known_nodes
-      @node.known_nodes.each{|n|passert{n.has_signature?(::Node)}}
-      @node.known_nodes
+    def nodes
+      @node.nodes.each{|n|passert{n.has_signature?(::Node)}}
+      @node.nodes
     end
   
     def service(serviceKlass)

@@ -29,7 +29,7 @@ class KeyValueStore
   
   def get_node(key)
     hash=NodeId.from_string(key)
-    m=known_nodes.map{|a|[a,a.node_hash.diff(hash)]}.min{|a,b | a[1]<=>b[1]}[0]
+    m=nodes.map{|a|[a,a.node_hash.diff(hash)]}.min{|a,b | a[1]<=>b[1]}[0]
   end
 end
 
@@ -75,6 +75,6 @@ class RedundantKeyValueStore
   
   def get_node(key)
     hash=NodeId.from_string(key)
-    m=known_nodes.map{|a|[a,a.node_hash.diff(hash)]}.sort{|a,b | a[1]<=>b[1]}[0...@redundancy].map{|a|a[0]}
+    m=nodes.map{|a|[a,a.node_hash.diff(hash)]}.sort{|a,b | a[1]<=>b[1]}[0...@redundancy].map{|a|a[0]}
   end
 end

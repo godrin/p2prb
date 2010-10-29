@@ -5,7 +5,7 @@ require File.expand_path('../node_id.rb',__FILE__)
 
 module Node
   def self.signature
-    [:known_nodes,:service,:got_new_peer,:proxy]
+    [:nodes,:service,:got_new_peer,:proxy]
   end
 end
 
@@ -36,7 +36,7 @@ class Node
   STANDARD_PEER_COUNT=4
   
   attr_accessor :peers
-  attr_accessor :known_nodes
+  attr_accessor :nodes
   attr_accessor :masters
   attr_accessor :nodeid, :ip, :port
   attr_reader :proxy
@@ -48,7 +48,7 @@ class Node
   def initialize
     @proxy=self
     @peers=[]
-    @known_nodes=[]
+    @nodes=[]
     @masters=[]
     @services={}
     event(:created)
@@ -56,7 +56,7 @@ class Node
   
   def proxy=(pProxy)
     if @proxy==self
-      passert{pProxy.respond_to?(:known_nodes) and pProxy.respond_to?(:service)}
+      passert{pProxy.respond_to?(:nodes) and pProxy.respond_to?(:service)}
       @proxy=pProxy
     else
       raise "proxy already set!"
@@ -78,7 +78,7 @@ class Node
   end
   def remote_service(nodeId,klass)
     passert { nodeId.is_a?(NodeId) }
-    @known_nodes.select{|node|node.node_hash==nodeId}[0].service(klass)
+    @nodes.select{|node|node.node_hash==nodeId}[0].service(klass)
   end
   
   def step
@@ -91,12 +91,12 @@ class Node
     NodeId.from_string(self.object_id.to_s)
   end
   
-  def known_node_ids
-    @known_nodes.map{|node|node.node_hash}
+  def node_ids
+    @nodes.map{|node|node.node_hash}
   end
   
   def register_at_master
-    #passert { @known_nodes.empty? }
+    #passert { @nodes.empty? }
     #passert { @peers.empty? }
     
     if @masters.empty?
@@ -104,11 +104,11 @@ class Node
     else
       @masters.each{|master|
         master.register(proxy)
-        nuNodes=master.known_nodes
+        nuNodes=master.nodes
         nuNodes.each{|n|passert{n}}
-        @known_nodes+=nuNodes
-        @known_nodes.uniq!
-        @known_nodes.each{|n|passert{n}}
+        @nodes+=nuNodes
+        @nodes.uniq!
+        @nodes.each{|n|passert{n}}
         event(:new_nodes)
       }
       enqueue
@@ -117,7 +117,7 @@ class Node
   
   def checkForEnoughPeers
     if @peers.length<STANDARD_PEER_COUNT
-      (@known_nodes-@peers-[self]).each {| node |
+      (@nodes-@peers-[self]).each {| node |
         add_as_peer(node)
         break if @peers.length>=STANDARD_PEER_COUNT
       }
@@ -125,7 +125,7 @@ class Node
   end
   
   def checkForNodesFromPeer(peer)
-    add_new_nodes(peer.known_nodes)
+    add_new_nodes(peer.nodes)
   end
   
   def add_as_peer(node)
@@ -147,8 +147,8 @@ class Node
   
   def add_new_node(other)
     passert {other}
-    unless @known_nodes.member?(other)
-      @known_nodes<<other
+    unless @nodes.member?(other)
+      @nodes<<other
       event(:new_nodes,[other])
     end
   end

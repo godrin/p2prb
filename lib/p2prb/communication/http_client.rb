@@ -46,9 +46,8 @@ module P2P
       @ci=clientInterface
     end
   
-    def register_node(node)
-      post("/register_node",{'node'=>YAML.dump(node)})
-      
+    def nodes=(node)
+      post("/node",{'node'=>YAML.dump(node)})
     end
   
     def get_id
@@ -78,7 +77,15 @@ module P2P
     private
     def post(path,args)
       @ci.post(path,args)
-      YAML.load(@ci.last_response.body)
+      begin
+        pp @ci.last_response.body
+        if @ci.last_response.body=="fail"
+          raise "failed to post #{path} with #{args.inspect} -- got '#{@ci.last_response.body.to_s[0..30]}'"
+        end
+        YAML.load(@ci.last_response.body)
+      rescue ArgumentError=>e
+        raise "failed to post #{path} with #{args.inspect} -- got '#{@ci.last_response.body.to_s[0..30]}'"
+      end
     end
     def get(path,args={})
       @ci.get(path,args)

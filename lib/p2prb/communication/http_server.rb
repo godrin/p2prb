@@ -89,12 +89,15 @@ module P2P
       end
     end
 
-    post '/register_node' do
-      node=YAML.load(params[:node])
+    post '/node' do
+      node=YAML.load(params["node"])
+      pp node
+      return "fail" unless node.has_signature?(NodeImplementation)
       node.ip=env["REMOTE_HOST"]
+      pp "XX"
       
       @node.add_node(node)
-      "ok"
+      YAML.dump(true)
     end
     
     get '/service/:name/:method' do
