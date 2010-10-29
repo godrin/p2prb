@@ -1,3 +1,5 @@
+require 'test/unit'
+
 require 'rack/test'
 require 'p2prb'
 
@@ -10,6 +12,14 @@ class TestRestInterface < Test::Unit::TestCase
   class MyComplexService
     def somepostfunc!
       :ok
+    end
+    def a=(xyz)
+      @a=xyz
+      "ok"
+    end
+    
+    def a
+      @a
     end
   end
 
@@ -93,5 +103,16 @@ class TestRestInterface < Test::Unit::TestCase
     post '/service/myservice/somepostfunc'
     y=YAML.load(last_response.body)
     assert_equal :ok,y
+  end
+  
+  
+  def test_service_put_call
+    s=MyComplexService.new
+    services={"myservice"=>s}
+    @node.services=services
+    put '/service/myservice/a',{:value=>"value"}
+    y=YAML.load(last_response.body)
+    assert_equal "ok",y
+    assert_equal "value",s.a
   end
 end

@@ -98,37 +98,47 @@ module P2P
     end
     
     get '/service/:name/:method' do
-      begin
-        name=params[:name]
-        method=params[:method]
-        if secure?(method)
-          service=@node.service(name)
-          f=service.method(method)
-          if f.arity==1
-            YAML.dump(f.call(params))
-          else
-            YAML.dump(f.call)
-          end
-        else
-          "fail"
-        end
-      rescue Object=>e
-        puts e,e.backtrace
-        "fail"
-      end
+      name=params[:name]
+      method=params[:method]
+      callService(name,method)
+    end
+
+    put '/service/:name/:method' do
+      name=params[:name]
+      method=params[:method]+"="
+      callService(name,method,params[:value])
     end
 
     post '/service/:name/:method' do
+      name=params[:name]
+      method=params[:method]+"!"
+      callService(name,method)
+    end
+    
+    def callService(name,method,value=nil)
       begin
-        name=params[:name]
-        method=params[:method]+"!"
         if secure?(method)
           service=@node.service(name)
           f=service.method(method)
-          if f.arity==1
-            YAML.dump(f.call(params))
-          else
+          if f.arity==0
             YAML.dump(f.call)
+          else
+            if params[:value]
+              ps=params[:value]
+            elsif params[:arg0]
+              ps=[]
+              0.up_to(10) {|i|
+                p=params["arg"+i]
+                if p
+                  ps<<p
+                else
+                  break
+                end
+              }
+            else
+              ps=[params]
+            end
+            YAML.dump(f.call(*ps))
           end
         else
           "fail"
