@@ -28,7 +28,7 @@ module P2P
  
     def self.go!(hash)
       node=hash[:node]
-
+      puts "NODE:",node
       node.nodeid=hash[:nodeid]
       node.ip=hash[:host]
       node.port=hash[:port]

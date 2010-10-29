@@ -3,43 +3,14 @@ require 'test/unit'
 require 'rack/test'
 require 'p2prb'
 
+require 'testing_node.rb'
+
 class TestRestInterface < Test::Unit::TestCase
   include Rack::Test::Methods
   
-  NodeInfo=Struct.new(:id,:last_modified)
-  MyService=Struct.new(:testfunction)
-  
-  class MyComplexService
-    def somepostfunc!
-      :ok
-    end
-    def a=(xyz)
-      @a=xyz
-      "ok"
-    end
-    
-    def a
-      @a
-    end
-  end
-
-  class Node
-    attr_accessor :nodes,:peers,:me,:services
-    
-    def nodes_younger_than(time)
-      if time.is_a?(Time)
-        @nodes.select{|node|node.last_modified>time}
-      else
-        nil
-      end
-    end
-    def service(name)
-      @services[name]
-    end
-  end
   
   def setup
-    @node=Node.new
+    @node=Testing::Node.new
   end
   
   def app
@@ -55,9 +26,9 @@ class TestRestInterface < Test::Unit::TestCase
   end
   
   def test_get_nodes_younger_than_x
-    a=NodeInfo.new(:a,Time.parse("2010/01/02 23:10:06"))
-    b=NodeInfo.new(:b,Time.parse("2010/01/02 23:10:07"))
-    c=NodeInfo.new(:c,Time.parse("2010/07/02 03:10:06"))
+    a=Testing::NodeInfo.new(:a,Time.parse("2010/01/02 23:10:06"))
+    b=Testing::NodeInfo.new(:b,Time.parse("2010/01/02 23:10:07"))
+    c=Testing::NodeInfo.new(:c,Time.parse("2010/07/02 03:10:06"))
     
     @node.nodes=[a,b,c]
     get '/nodes'
@@ -87,7 +58,7 @@ class TestRestInterface < Test::Unit::TestCase
   end
   
   def test_service_get_call
-    s=MyService.new(:testreturn)
+    s=Testing::MyService.new(:testreturn)
     assert_equal :testreturn,s.testfunction
     services={"myservice"=>s}
     @node.services=services
@@ -97,7 +68,7 @@ class TestRestInterface < Test::Unit::TestCase
   end
   
   def test_service_post_call
-    s=MyComplexService.new
+    s=Testing::MyComplexService.new
     services={"myservice"=>s}
     @node.services=services
     post '/service/myservice/somepostfunc'
@@ -107,7 +78,7 @@ class TestRestInterface < Test::Unit::TestCase
   
   
   def test_service_put_call
-    s=MyComplexService.new
+    s=Testing::MyComplexService.new
     services={"myservice"=>s}
     @node.services=services
     put '/service/myservice/a',{:value=>"value"}

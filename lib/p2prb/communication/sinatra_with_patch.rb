@@ -8,7 +8,6 @@ module Sinatra
   
     attr_accessor :server
     
-#    undef :run!
     def self.run!(options={})
       started=false
       result=nil
